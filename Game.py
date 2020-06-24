@@ -224,6 +224,7 @@ class Application(QMainWindow):
         next_button_font.setUnderline(False)
         next_button.setFont(next_button_font)
         next_button.setDisabled(True)
+        next_button.clicked.connect(lambda: self.word_guessing_page(textinput.text()))
         self.next_button = next_button
 
         char_alert_2 = QtWidgets.QLabel(get_word_frame)
@@ -240,6 +241,111 @@ class Application(QMainWindow):
 
 
         get_word_frame.show()
+
+
+
+    def word_guessing_page(self, word):
+        guess_word_frame = QtWidgets.QFrame(self)
+        guess_word_frame.setGeometry(0, 0, self.width(), self.height())
+        self.guess_word_frame = guess_word_frame
+
+        title = QtWidgets.QLabel(guess_word_frame)
+        title.setText("GUESS THE WORD!")
+        font = QtGui.QFont()
+        font.setFamily("Bahnschrift")
+        font.setPointSize(35)
+        font.setBold(True)
+        font.setUnderline(True)
+        title.setFont(font)
+        title.adjustSize()
+        title.move(int((self.width() - title.width()) / 2), 30)
+        self.guess_word_title = title
+
+        word_widget = QtWidgets.QWidget(guess_word_frame)
+        word_widget.setGeometry(0, int(self.height()/4), self.width(), 100)
+        word_widget_layout = QtWidgets.QHBoxLayout()
+        word_widget_layout.setAlignment(QtCore.Qt.AlignCenter)
+        word_widget_layout.setSpacing(15)
+        word_widget.setLayout(word_widget_layout)
+        self.word_widget = word_widget
+
+        label_font = QtGui.QFont(font)
+        label_font.setPointSize(40)
+        all_labels = {}
+        for char in word:
+            label = QtWidgets.QLabel()
+            label.setText("  ")   #Two spaces
+            label.setFont(label_font)
+            word_widget_layout.addWidget(label)
+            try:
+                all_labels[char].append(label)
+            except:
+                all_labels[char] = [label]
+
+
+        letters_widget = QtWidgets.QWidget(guess_word_frame)
+        letters_widget.setGeometry(int(self.width()/2), int(self.height()/2), int(self.width()/2), int(self.height()/2))
+        letters_widget_layout = QtWidgets.QGridLayout()
+        letters_widget.setLayout(letters_widget_layout)
+        self.letters_widget = letters_widget
+
+        button_font = QtGui.QFont(label_font)
+        button_font.setPointSize(20)
+        button_font.setUnderline(False)
+        column = 0
+        row = 0
+
+        self.wrong_guess = 0
+        def char_button_function(button):
+            char = button.text()
+            if char in word:
+                for label in all_labels[char]:
+                    label.setText(char)
+
+            else:
+                if self.wrong_guess < 10:
+                    self.wrong_guess += 1
+                    pixmap = QtGui.QPixmap(f"Images/Hangman{self.wrong_guess}.png")
+                    hangman_label.setPixmap(pixmap)
+                    hangman_label.adjustSize()
+                    hangman_label.move(self.hangman_spacing, self.height()-hangman_label.height()-self.hangman_spacing)
+                    hangman_label.show()
+                else:
+                    pixmap = QtGui.QPixmap(f"Images/Hangman{self.wrong_guess+1}.png")
+                    hangman_label.setPixmap(pixmap)
+                    hangman_label.adjustSize()
+                    print("game over")
+
+            button.setDisabled(True)
+
+        for char in string.ascii_uppercase:
+            if column == 6:
+                row += 1
+                column = 0
+            button = QtWidgets.QPushButton()
+            button.setStyleSheet("background-color: none")
+            button.setFixedSize(65, 65)
+            button.setFont(button_font)
+            button.setText(char)
+            button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+            button.clicked.connect(lambda b, btn=button: char_button_function(btn))  #'b' argument in lambda is for receiving boolean from .connect()
+            if row == 4 and column == 0:
+                column = 2
+            letters_widget_layout.addWidget(button, row, column)
+            column += 1
+
+
+            hangman_label = QtWidgets.QLabel(guess_word_frame)
+            hangman_label.setAlignment(QtCore.Qt.AlignBottom)
+            self.hangman_spacing = 10
+            self.hangman_initial_size = (round(self.width()/2, 0), round(self.height()/2, 0))
+            self.hangman_label = hangman_label
+
+
+
+
+
+        guess_word_frame.show()
 
 
 
@@ -263,6 +369,9 @@ class Application(QMainWindow):
         try:
             self.guess_word_frame.resize(self.width(), self.height())
             self.guess_word_title.move(int((self.width() - self.guess_word_title.width()) / 2), 30)
+            self.word_widget.setGeometry(0, int(self.height()/4), self.width(), 100)
+            self.letters_widget.setGeometry(int(self.width()/2), int(self.height()/2), int(self.width()/2), int(self.height()/2))
+            self.hangman_label.move(self.hangman_spacing, self.height()-self.hangman_label.height()-self.hangman_spacing)
 
         except:
             pass
