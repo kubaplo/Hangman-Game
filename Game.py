@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QMainWindow, QApplication
-import sys, time, string, threading
+import sys, time, string, threading, random
 
 
 class Application(QMainWindow):
@@ -118,7 +118,6 @@ class Application(QMainWindow):
             showing_alert = False
             maxCount = 20
             minCount = 3
-
             def keyPressEvent(self, event):
                 key = event.text()
                 ord_key = event.key()
@@ -205,6 +204,31 @@ class Application(QMainWindow):
         char_alert.setStyleSheet("color: red")
         char_alert.hide()
         self.char_alert = char_alert
+
+        dice_button = QtWidgets.QPushButton(get_word_frame)
+        dice_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        dice_button.resize(50, 50)
+        dice_button.move(textinput.x()+textinput.width()+20, textinput.y()+int((textinput.height()-dice_button.height())/2))
+        dice_button.setIcon(QtGui.QIcon("Images/dice.png"))
+        dice_button.setIconSize(QtCore.QSize(40, 40))
+
+        with open("database.data", "r") as file:
+            data = file.read()
+        data = data.split("\n")
+
+        def random_word():
+            random_generated_word = random.choice(data)
+            for _ in range(len(textinput.text())):
+                key_event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, QtCore.Qt.Key_Backspace, QtCore.Qt.NoModifier, 0, 0, 0)
+                textinput.keyPressEvent(key_event)
+
+            for letter in random_generated_word:
+                key_event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, ord(letter), QtCore.Qt.NoModifier, 0, 0, 0, text=letter.upper())
+                textinput.keyPressEvent(key_event)
+
+
+        dice_button.clicked.connect(random_word)
+        self.dice_button = dice_button
 
 
         class CustomNextButton(QtWidgets.QPushButton):
@@ -335,7 +359,8 @@ class Application(QMainWindow):
                     hangman_label.move(self.hangman_spacing, self.height()-hangman_label.height()-self.hangman_spacing)
                     hangman_label.show()
                 else:
-                    pixmap = QtGui.QPixmap(f"Images/Hangman{self.wrong_guess+1}.png")
+                    self.wrong_guess += 1
+                    pixmap = QtGui.QPixmap(f"Images/Hangman11.png")
                     hangman_label.setPixmap(pixmap)
                     hangman_label.adjustSize()
 
@@ -364,6 +389,7 @@ class Application(QMainWindow):
 
             hangman_label = QtWidgets.QLabel(guess_word_frame)
             hangman_label.setAlignment(QtCore.Qt.AlignBottom)
+            hangman_label.setAttribute(QtCore.Qt.WA_TranslucentBackground)
             self.hangman_spacing = 10
             self.hangman_label = hangman_label
 
@@ -399,7 +425,7 @@ class Application(QMainWindow):
         details_label.setFont(details_label_font)
         details_label.setText(f"- Chosen word: {self.word}\n"
                               f"- You guessed {round((len(self.correct_letters)/len(self.word))*100, 2)}% of given word\n"
-                              f"- You made {self.wrong_guess} / 10 mistakes\n"
+                              f"- You made {self.wrong_guess} / 11 mistakes\n"
                               f"- You were playing for: {int(self.guessing_time)} seconds")
 
         details_label.adjustSize()
@@ -439,8 +465,6 @@ class Application(QMainWindow):
             self.game_title.move(int((self.width()-self.game_title.width())/2), 20)
             self.background_image.move(int((self.width() - self.background_image.width()) / 2), self.game_title.y() + self.game_title.height() + 30)
             self.start_button.move(int((self.width() - self.start_button.width()) / 2), self.start_button.y())
-
-
         except:
             pass
 
@@ -448,6 +472,8 @@ class Application(QMainWindow):
             self.get_word_frame.resize(self.width(), self.height())
             self.get_word_title.move(int((self.get_word_frame.width()-self.get_word_title.width())/2), 30)
             self.textinput.move(int((self.get_word_frame.width()-self.textinput.width())/2), int(self.get_word_frame.height()/4))
+            self.dice_button.move(self.textinput.x() + self.textinput.width() + 20, self.textinput.y() + int((self.textinput.height() - self.dice_button.height()) / 2))
+
             self.letters_container.setGeometry(0, int(self.height()/1.9), self.width(), 150)
             self.char_alert.move(int((self.get_word_frame.width()-self.char_alert.width())/2), int(self.textinput.y()+self.textinput.height()+5))
             self.next_button.move(int((self.width() - self.next_button.width()) / 2), self.height() - self.next_button.height() - 20)
