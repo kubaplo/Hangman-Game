@@ -61,6 +61,40 @@ class Application(QMainWindow):
         start_button.clicked.connect(next_page)
         self.start_button = start_button
 
+        ai_game_button = QtWidgets.QPushButton(start_frame)
+        ai_game_button.setStyleSheet("background-color: none")
+        ai_game_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        ai_game_button.resize(start_button.width(), start_button.height())
+        ai_game_button.move(start_button.x(), start_button.y())
+        ai_game_button.setFont(button_font)
+        ai_game_button.setText("PLAY WITH AI")
+        def play_with_ai():
+            with open("database.data", "r") as file:
+                data = file.read()
+
+            random_word = random.choice(data.split("\n"))
+
+            self.word_guessing_page(random_word.upper())
+
+        ai_game_button.clicked.connect(play_with_ai)
+        self.ai_game_button = ai_game_button
+
+        self.sliding_ai_button = True
+        def move_button_down():
+            distance = self.start_button.height() + 20
+
+            for _ in range(distance):
+                self.ai_game_button.move(self.start_button.x(), self.ai_game_button.y()+1)
+                time.sleep(0.005)
+
+            self.sliding_ai_button = False
+
+        move_button_down_thread = threading.Thread(target=move_button_down, daemon=True)
+        move_button_down_thread.start()
+
+
+
+
         start_frame.show()
 
 
@@ -465,6 +499,8 @@ class Application(QMainWindow):
             self.game_title.move(int((self.width()-self.game_title.width())/2), 20)
             self.background_image.move(int((self.width() - self.background_image.width()) / 2), self.game_title.y() + self.game_title.height() + 30)
             self.start_button.move(int((self.width() - self.start_button.width()) / 2), self.start_button.y())
+            if not self.sliding_ai_button:
+                self.ai_game_button.move(self.start_button.x(), self.start_button.y()+self.start_button.height()+20)
         except:
             pass
 
