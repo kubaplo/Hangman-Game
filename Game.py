@@ -92,9 +92,6 @@ class Application(QMainWindow):
         move_button_down_thread = threading.Thread(target=move_button_down, daemon=True)
         move_button_down_thread.start()
 
-
-
-
         start_frame.show()
 
 
@@ -152,6 +149,7 @@ class Application(QMainWindow):
             showing_alert = False
             maxCount = 20
             minCount = 3
+
             def keyPressEvent(self, event):
                 key = event.text()
                 ord_key = event.key()
@@ -193,8 +191,6 @@ class Application(QMainWindow):
                     next_button.setDisabled(True)
 
 
-
-
             def too_many_letters(self):
                 self.showing_alert = True
                 char_alert.show()
@@ -205,13 +201,11 @@ class Application(QMainWindow):
                 self.showing_alert = False
 
 
-
             def mousePressEvent(self, event):
                 pass
 
             def mouseDoubleClickEvent(self, event):
                 pass
-
 
 
         textinput = CustomLineEdit(get_word_frame)
@@ -259,7 +253,6 @@ class Application(QMainWindow):
             for letter in random_generated_word:
                 key_event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, ord(letter), QtCore.Qt.NoModifier, 0, 0, 0, text=letter.upper())
                 textinput.keyPressEvent(key_event)
-
 
         dice_button.clicked.connect(random_word)
         self.dice_button = dice_button
@@ -310,9 +303,7 @@ class Application(QMainWindow):
         char_alert_2.hide()
         self.char_alert_2 = char_alert_2
 
-
         get_word_frame.show()
-
 
 
     def word_guessing_page(self, word):
@@ -427,10 +418,7 @@ class Application(QMainWindow):
             self.hangman_spacing = 10
             self.hangman_label = hangman_label
 
-
         guess_word_frame.show()
-
-
 
 
     def end_page(self, win: bool, details=[]):
@@ -466,7 +454,6 @@ class Application(QMainWindow):
         details_label.move(10, int(self.height()/1.7))
         self.details_label = details_label
 
-
         new_game_button = QtWidgets.QPushButton(end_frame)
         new_game_button.setStyleSheet("background-color: none")
         new_game_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
@@ -484,13 +471,7 @@ class Application(QMainWindow):
         new_game_button.clicked.connect(new_game)
         self.new_game_button = new_game_button
 
-
-
         end_frame.show()
-
-
-
-
 
 
 
@@ -531,17 +512,8 @@ class Application(QMainWindow):
             self.result_label.move(int((self.width()-self.result_label.width())/2), int((self.height()-self.result_label.height())/2))
             self.details_label.move(10, int(self.height()/1.7))
             self.new_game_button.move(int((self.details_label.width()-self.new_game_button.width())/2), self.details_label.y()+self.details_label.height()+self.button_margin)
-
         except:
             pass
-
-
-
-
-
-
-
-
 
 
 
